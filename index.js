@@ -46,9 +46,7 @@ mongoose.connect('mongodb+srv://Sharainwy:Mindbnk48@shar.xu2urv6.mongodb.net/', 
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
-
 const db = mongoose.connection;
-
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', () => {
   console.log('Connect MongoDB Successfully');
@@ -159,15 +157,7 @@ async function handleEvent(event) {
         timestamp: event.timestamp,
       };
 
-      // Get user profile and store it in eventData
       eventData.profile = await getProfile(event.source.userId);
-
-      //     await Event.findOneAndUpdate(
-      //       { 'source.userId': event.source.userId },
-      //       eventData,
-      //       { upsert: true }
-      //     );
-      // // Save the beacon event data to MongoDB
       const existingEvent = await Event.findOne({ 'profile.userId': eventData.userId });
       if (existingEvent) {
         await Event.deleteMany({ 'profile.userId': eventData.userId });
@@ -191,9 +181,6 @@ async function handleEvent(event) {
       console.log('UserID : ' + UserID + '\nEvent : ' + msgtype + '  type : ' + Rev);
       switch (message.type) {
         case 'text':
-          // wss.clients.forEach((client) => {
-          // }); client.send(JSON.stringify({ type: 'text', text: message.text }));
-          
           return handleText(message, event.replyToken);
         case 'image':
           return handleImage(message, event.replyToken);
@@ -241,23 +228,18 @@ async function handleEvent(event) {
 function handleText(message, replyToken) {
   return replyText(replyToken, message.text);
 }
-
 function handleImage(message, replyToken) {
   return replyText(replyToken, 'Got Image');
 }
-
 function handleVideo(message, replyToken) {
   return replyText(replyToken, 'Got Video');
 }
-
 function handleAudio(message, replyToken) {
   return replyText(replyToken, 'Got Audio');
 }
-
 function handleLocation(message, replyToken) {
   return replyText(replyToken, 'Got Location');
 }
-
 function handleSticker(message, replyToken) {
   return replyText(replyToken, 'Got Sticker');
 }
@@ -275,7 +257,7 @@ wss.on('connection', (ws) => {
       // สร้างข้อมูลที่จะส่งกลับไปยังหน้าเว็บ
       const dataToSend = {
         type: 'beacon',
-        text: beacon.teye,
+        text: event.beacon.type,
         userId: userProfile.userId,
         displayName: userProfile.displayName,
         pictureUrl: userProfile.pictureUrl,
